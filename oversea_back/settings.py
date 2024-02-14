@@ -50,7 +50,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# # RDS
+# RDS
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",

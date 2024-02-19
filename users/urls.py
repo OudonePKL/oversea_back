@@ -8,7 +8,7 @@ app_name = 'users'
 urlpatterns = [
     # join the membership
     path("signup", views.SignupView.as_view(), name="signup"),
-    path("seller-signup", views.SellerSignup.as_view(), name="seller_google_signup"),
+    path("seller-signup", views.SellerSignup.as_view(), name="seller_signup"),
     # Email Authentication
     path("send-email", views.SendEmail.as_view(), name="send_email"),
     path("check-email", views.CheckEmailView.as_view(), name="check_email"),

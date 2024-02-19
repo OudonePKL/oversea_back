@@ -50,6 +50,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(email=email, password=password)
         user.is_superuser = True
         user.is_staff = True
+        user.is_seller = True
         user.save(using=self._db)
         return user
 
@@ -66,6 +67,8 @@ class UserModel(AbstractBaseUser):
     password = models.CharField(verbose_name="password", max_length=128)
 
     is_staff = models.BooleanField(default=False, verbose_name="Staff")
+
+    is_seller = models.BooleanField(default=False, verbose_name="Shope owner")
 
     is_client = models.BooleanField(default=True, verbose_name="Active")
 

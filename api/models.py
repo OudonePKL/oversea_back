@@ -68,7 +68,6 @@ class Order(models.Model):
     )
 
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    post_office = models.CharField(max_length=10)
     tel = models.CharField(max_length=20)
     total_prices = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)

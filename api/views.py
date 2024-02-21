@@ -204,7 +204,7 @@ class CartCreateAPIView(APIView):
         serializer = CreateCartSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "success"},status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CartUpdateAPIView(APIView):
@@ -304,6 +304,13 @@ class UserReviewListView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs['user_id']
         return Review.objects.filter(user_id=user_id)
+
+class ProductReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs['product_id']
+        return Review.objects.filter(product_id=product_id)
 
 class ReviewDeleteView(generics.DestroyAPIView):
     def delete(self, request, pk, format=None):

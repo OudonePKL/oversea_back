@@ -21,4 +21,6 @@ urlpatterns = [
     # User information related
     path("my-page", views.UserView.as_view(), name="my_page"),
     path("my-page/profile", views.ChangeUserProfile.as_view(), name="ChangeUserProfile"),
+    # User detial
+    path("detail/<int:pk>", views.UserDetailAPIView.as_view(), name="user_detail"),
 ]

@@ -23,6 +23,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 from .form import UserForm
 from .models import CheckEmail, UserModel
@@ -37,6 +39,7 @@ from django.shortcuts import render
 import smtplib
 import jwt
 from django.conf import settings
+
 
 
 # Send email
@@ -616,3 +619,6 @@ def resize_image(image_data, output_size=(800, 600), quality=85):
         print(e)
         return image_data
 
+class UserDetailAPIView(generics.RetrieveAPIView):
+    queryset = UserModel.objects.all()
+    serializer_class = UserSerializer

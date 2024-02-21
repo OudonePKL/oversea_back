@@ -211,6 +211,7 @@ class LoginView(TokenObtainPairView):
             user = UserModel.objects.get(email=data.get('email'))
             return Response(data={'token': token, "user_id": user.id, 
                                   "user_name": user.nickname,
+                                  "is_staff": user.is_staff,
                                   "email": user.email if user.email else False,
                                   "image": user.profile_image.url if user.profile_image else False
                                   }, status=200)

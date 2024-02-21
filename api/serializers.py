@@ -42,13 +42,15 @@ class ProductListSerializer(serializers.ModelSerializer):
         return serializer.data
     
     def get_images(self, obj):
-        images = ProductImage.objects.filter(product=obj)
-        serializer = ProductImageSerializer(images, many=True)
-        return serializer.data
+        image = ProductImage.objects.filter(product=obj).first()
+        serializer = ProductImageSerializer(image)
+        image = serializer.data.get("image")
+        return image
 
     class Meta:
         model = Product
         fields = '__all__'
+
 
 class CreateProductSerializer(serializers.ModelSerializer):
     sizes = serializers.ListField(child=serializers.CharField(max_length=50), write_only=True)
@@ -194,7 +196,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'post_office', 'tel', 'total_prices', 'status', 'items']
+        fields = ['id', 'user', 'post_office', 'tel', 'total_prices', 'status', 'items', 'created_at']
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:

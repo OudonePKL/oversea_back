@@ -64,61 +64,103 @@ class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         return Response({"message": "success"}, status=status.HTTP_200_OK)
 
 
+# class ProductListAPIView(generics.ListAPIView):
+#     def get(self, request, goods_id=None):
+#         """
+#          <View product>
+#          goods_id O -> View details
+#          goods_id
+#          * Separately removed due to merchant permission issues *
+#          """
+#         if goods_id is None:
+#             category = request.GET.get('category', '1')  # You can provide default values.
+#             goods = Product.objects.all()
+#             if not goods.exists():
+#                 return Response([], status=200)
+#             """
+#              <Filtering branch>
+#              - Latest
+#              - Old shoots
+#              - Price ascending & descending order
+#              - Ascending & descending number of reviews (5,6)
+#              """
+#             if category == '2':
+#                 goods = goods.order_by(
+#                     "-price"
+#                 )
+#             elif category == '3':
+#                 goods = goods.annotate(review_count=Count("reviewmodel")).order_by(
+#                     "-review_count"
+#                 )
+#             elif category == '4':
+#                 goods = goods.order_by(
+#                     "price"
+#                 )
+#             elif category == '5':
+#                 goods = goods.annotate(order_count=Count("ordermodel")).order_by(
+#                     "-order_count"
+#                 )
+#             elif category == '6':
+#                 goods = goods.annotate(order_count=Count("ordermodel")).order_by(
+#                     "-created_at"
+#                 )
+#             else:
+#                 try:
+#                     goods = goods.order_by("-price")
+#                 except Exception as e:
+#                     print(e)
+#                     return Response(
+#                         {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST
+#                     )
+#             serializer = ProductListSerializer(goods, many=True)
+#             return Response(serializer.data, status=200)
+#         else:
+#             goods = get_object_or_404(Product, id=goods_id)
+#             serializer = ProductListSerializer(goods)
+#             order_total = Order.objects.filter(user_id=request.user.id, goods=goods).count()
+#             review_total = Review.objects.filter(user_id=request.user.id, goods=goods).count()
+#             result = serializer.data.copy()
+#             if order_total >= review_total:
+#                 result['is_ordered'] = True
+#             else:
+#                 result['is_ordered'] = False
+#             return Response(result, status=200)
+    
+
 class ProductListAPIView(generics.ListAPIView):
-    # queryset = Product.objects.all()
-    # serializer_class = ProductListSerializer
+    serializer_class = ProductListSerializer
+
+    def get_queryset(self):
+        category = self.request.GET.get('category', '1')  # You can provide default values.
+        goods = Product.objects.all()
+        
+        if category == '2':
+            goods = goods.order_by("-price")
+        elif category == '3':
+            goods = goods.annotate(review_count=Count("review")).order_by("-review_count")
+        elif category == '4':
+            goods = goods.order_by("price")
+        else:
+            goods = goods.order_by("-created_at")
+        
+        return goods
+
     def get(self, request, goods_id=None):
         """
-         <View product>
-         goods_id O -> View details
-         goods_id
-         * Separately removed due to merchant permission issues *
-         """
+        <View product>
+        goods_id O -> View details
+        goods_id
+        * Separately removed due to merchant permission issues *
+        """
         if goods_id is None:
-            category = request.GET.get('category', '1')  # You can provide default values.
-            goods = Product.objects.all()
-            if not goods.exists():
+            queryset = self.get_queryset()
+            if not queryset.exists():
                 return Response([], status=200)
-            """
-             <Filtering branch>
-             - Latest
-             - Old shoots
-             - Price ascending & descending order
-             - Ascending & descending number of reviews (5,6)
-             """
-            if category == '2':
-                goods = goods.order_by(
-                    "-price"
-                )
-            elif category == '3':
-                goods = goods.annotate(review_count=Count("reviewmodel")).order_by(
-                    "-review_count"
-                )
-            elif category == '4':
-                goods = goods.order_by(
-                    "price"
-                )
-            elif category == '5':
-                goods = goods.annotate(order_count=Count("ordermodel")).order_by(
-                    "-order_count"
-                )
-            elif category == '6':
-                goods = goods.annotate(order_count=Count("ordermodel")).order_by(
-                    "-created_at"
-                )
-            else:
-                try:
-                    goods = goods.order_by("-price")
-                except Exception as e:
-                    print(e)
-                    return Response(
-                        {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST
-                    )
-            serializer = ProductListSerializer(goods, many=True)
+            serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data, status=200)
         else:
             goods = get_object_or_404(Product, id=goods_id)
-            serializer = ProductListSerializer(goods)
+            serializer = self.serializer_class(goods)
             order_total = Order.objects.filter(user_id=request.user.id, goods=goods).count()
             review_total = Review.objects.filter(user_id=request.user.id, goods=goods).count()
             result = serializer.data.copy()
@@ -127,6 +169,7 @@ class ProductListAPIView(generics.ListAPIView):
             else:
                 result['is_ordered'] = False
             return Response(result, status=200)
+        
 
 class ProductDetailAPIView(RetrieveAPIView):
     queryset = Product.objects.all()
@@ -250,14 +293,21 @@ class UserOrderListView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs['user_id']
         return Order.objects.filter(user_id=user_id)
+    
+
+class CreateOrderView(generics.CreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
 
 class OrderCreateAPIView(APIView):
     def post(self, request):
         serializer = OrderCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "success"},status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class OrderUpdateAPIView(APIView):
     def put(self, request, pk):
@@ -348,3 +398,16 @@ class UserPaymentAPIView(generics.RetrieveAPIView):
         return self.get_queryset().filter(user_id=user_id).first()
 
 
+class SearchView(APIView):
+    # @swagger_auto_schema(
+    #     tags=["search"], request_body=PostSerializer, responses={200: "Success"}
+    # )
+    def post(self, request):
+        search_word = request.data.get("search")
+        product_set = Product.objects.filter(
+            Q(name__icontains=search_word)
+        )
+
+        products = ProductListSerializer(product_set, many=True).data
+
+        return Response(products, status=status.HTTP_200_OK)

@@ -622,3 +622,4 @@ def resize_image(image_data, output_size=(800, 600), quality=85):
 class UserDetailAPIView(generics.RetrieveAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
+

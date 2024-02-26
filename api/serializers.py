@@ -1,5 +1,9 @@
+import math
 from rest_framework import serializers
 from .models import Category, Product, Size, Color, ProductImage, Cart, CartItem, Order, OrderItem, Review, Payment
+
+def format_with_commas(n):
+    return "{:,}".format(int(n))
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +34,10 @@ class ProductListSerializer(serializers.ModelSerializer):
     sizes = serializers.SerializerMethodField()
     colors = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
+    format_price = serializers.SerializerMethodField()
+    review_total = serializers.SerializerMethodField()
+    star_avg = serializers.SerializerMethodField()
 
     def get_sizes(self, obj):
         sizes = Size.objects.filter(product=obj)
@@ -46,6 +54,24 @@ class ProductListSerializer(serializers.ModelSerializer):
         serializer = ProductImageSerializer(image)
         image = serializer.data.get("image")
         return image
+    
+    def get_category(self, obj):
+        return obj.category.name
+    
+    def get_format_price(self, obj):
+        return str(format_with_commas(obj.price))
+    
+    def get_review_total(self, obj):
+        review_total = Review.objects.filter(product_id=obj.id).count()
+        return review_total
+    
+    def get_star_avg(self, obj):
+        review = Review.objects.filter(product_id=obj.id).values("rating")
+        total = 0
+        for i in review:
+            total += i["rating"]
+
+        return math.ceil(total / review.count()) if total != 0 else 0
 
     class Meta:
         model = Product
@@ -180,6 +206,8 @@ class CartUpdateSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ['id', 'user', 'created_at', 'items']
 
+
+
 # Order
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -196,12 +224,13 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'post_office', 'tel', 'total_prices', 'status', 'items', 'created_at']
+        fields = ['id', 'user', 'tel', 'total_prices', 'statement_image', 'province', 'district', 'shipping_company', 'branch', 'created_at', 'status', 'items']
+
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price', 'color', 'size']
+        fields = ['id', 'product', 'quantity', 'price', 'color', 'size']
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     items = OrderItemCreateSerializer(many=True, write_only=True)
@@ -215,7 +244,29 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['user', 'post_office', 'tel', 'status', 'total_prices', 'items']
+        fields = ['id', 'user', 'tel', 'total_prices', 'statement_image', 'province', 'district', 'shipping_company', 'branch', 'created_at', 'status', 'items']
+
+
+
+
+# class OrderItemCreateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = OrderItem
+#         fields = ['product', 'quantity', 'price', 'color', 'size']
+
+# class OrderCreateSerializer(serializers.ModelSerializer):
+#     items = OrderItemCreateSerializer(many=True, write_only=True)
+
+#     def create(self, validated_data):
+#         order_items_data = validated_data.pop('items')
+#         order = Order.objects.create(**validated_data)
+#         for order_item_data in order_items_data:
+#             OrderItem.objects.create(order=order, **order_item_data)
+#         return order
+
+#     class Meta:
+#         model = Order
+#         fields = ['user', 'tel', 'status', 'total_prices', 'statement_image', 'province', 'district', 'shipping_company', 'branch', 'items']
 
 class OrderItemUpdateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -230,7 +281,6 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
 
         # Update order fields
         instance.user = validated_data.get('user', instance.user)
-        instance.post_office = validated_data.get('post_office', instance.post_office)
         instance.tel = validated_data.get('tel', instance.tel)
         instance.status = validated_data.get('status', instance.status)
         instance.save()
@@ -244,7 +294,7 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['user', 'post_office', 'tel', 'status', 'items']
+        fields = ['user', 'tel', 'status', 'items']
 
 # =========== Create order not yet ===========
 

@@ -3,9 +3,10 @@ from .views import (
     ProductListAPIView, CreateProductAPIView, UpdateProductAPIView, DeleteProductAPIView, ProductDetailAPIView,
     CategoryListCreate, CategoryRetrieveUpdateDestroy,
     CartListView, CartDetailView, UserCartListView, CartDeleteView, CartCreateAPIView, CartUpdateAPIView,
-    OrderListView, OrderDetailView, UserOrderListView, OrderDeleteView, OrderCreateAPIView, OrderUpdateAPIView ,
+    SearchView, OrderListView, OrderDetailView, UserOrderListView, OrderDeleteView, OrderCreateAPIView, OrderUpdateAPIView ,
     ReviewListCreate, ReviewRetrieveUpdateDestroy, UserReviewListView, ReviewDeleteView,ProductReviewListView,
-    PaymentListCreate, PaymentRetrieveUpdateDestroy, UserPaymentAPIView
+    PaymentListCreate, PaymentRetrieveUpdateDestroy, UserPaymentAPIView,
+    CreateOrderView
 )
 
 urlpatterns = [
@@ -13,6 +14,7 @@ urlpatterns = [
     path('categories', CategoryListCreate.as_view(), name='category-list-create'),
     path('category/<int:pk>', CategoryRetrieveUpdateDestroy.as_view(), name='category-retrieve-update-destroy'),
     # Product
+    path("", ProductListAPIView.as_view(), name="product-list-by-category"),  # Product list related
     path('product/create', CreateProductAPIView.as_view(), name='create-product'),
     path('products', ProductListAPIView.as_view(), name='product-list'),
     path('product/<int:id>', ProductDetailAPIView.as_view(), name='product-detail'),
@@ -26,7 +28,10 @@ urlpatterns = [
     path('cart/update/<int:pk>', CartUpdateAPIView.as_view(), name='cart-update'),
     path('cart/delete/<int:pk>', CartDeleteView.as_view(), name='delete-cart'),
     # Order
+    path("search", SearchView.as_view(), name="search"),  # Order related
     path('orders', OrderListView.as_view(), name='order-list'),
+
+    path('create-order', CreateOrderView.as_view(), name='create-order'),
     path('order/create', OrderCreateAPIView.as_view(), name='order-create'),
     path('order/update/<int:pk>', OrderUpdateAPIView.as_view(), name='order-update'),
     path('order/<int:pk>', OrderDetailView.as_view(), name='order-detail'),

@@ -4,6 +4,7 @@ from users.models import UserModel
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='media/', null=True, blank=True)
     created_by = models.ForeignKey(UserModel, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -50,7 +51,7 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cartitem')
     quantity = models.PositiveIntegerField(default=1)
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=50)
@@ -70,6 +71,11 @@ class Order(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     tel = models.CharField(max_length=20)
     total_prices = models.DecimalField(max_digits=10, decimal_places=2)
+    statement_image = models.ImageField(upload_to='media/statement_image/', null=True, blank=True)
+    province = models.CharField(max_length=100, null=True, blank=True)
+    district = models.CharField(max_length=100, null=True, blank=True)
+    shipping_company = models.CharField(max_length=100, null=True, blank=True)
+    branch = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
 
@@ -78,7 +84,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orderitem')
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     color = models.CharField(max_length=50)
@@ -88,7 +94,7 @@ class OrderItem(models.Model):
         return f"OrderItem {self.pk} - Product: {self.product.name}, Quantity: {self.quantity}"
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='review')
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     rating = models.IntegerField()
     comment = models.TextField(blank=True)

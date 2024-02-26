@@ -151,7 +151,7 @@ class UpdateProductSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity', 'color', 'size']
+        fields = ['id', 'product', 'quantity', 'price', 'color', 'size']
 
 class CartSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
@@ -168,7 +168,7 @@ class CartSerializer(serializers.ModelSerializer):
 class CartItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['product', 'quantity', 'color', 'size']
+        fields = ['product', 'quantity', 'price', 'color', 'size']
 
 class CreateCartSerializer(serializers.ModelSerializer):
     items = CartItemCreateSerializer(many=True, write_only=True)
@@ -187,17 +187,45 @@ class CreateCartSerializer(serializers.ModelSerializer):
 class CartItemUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity', 'color', 'size']
+        fields = ['id', 'product', 'quantity', 'price', 'color', 'size']
+
+# class CartUpdateSerializer(serializers.ModelSerializer):
+#     items = CartItemUpdateSerializer(many=True, write_only=True)
+
+#     def update(self, instance, validated_data):
+#         cart_items_data = validated_data.pop('items')
+
+#         if cart_items_data is not None:
+#             CartItem.objects.filter(cart=instance).delete()
+#             for cart_item_data in cart_items_data:
+#                 CartItem.objects.create(cart=instance, **cart_item_data)
+
+#         return instance
+
+#     class Meta:
+#         model = Cart
+#         fields = ['id', 'user', 'created_at', 'items']
+
 
 class CartUpdateSerializer(serializers.ModelSerializer):
     items = CartItemUpdateSerializer(many=True, write_only=True)
 
     def update(self, instance, validated_data):
-        cart_items_data = validated_data.pop('items')
+        cart_items_data = validated_data.pop('items', [])
 
-        if cart_items_data is not None:
-            CartItem.objects.filter(cart=instance).delete()
-            for cart_item_data in cart_items_data:
+        for cart_item_data in cart_items_data:
+            # Retrieve the cart item ID if provided
+            cart_item_id = cart_item_data.get('id', None)
+            
+            if cart_item_id:
+                # If cart item ID is provided, update the existing cart item
+                cart_item = CartItem.objects.get(id=cart_item_id, cart=instance)
+                # Update the cart item attributes
+                for attr, value in cart_item_data.items():
+                    setattr(cart_item, attr, value)
+                cart_item.save()
+            else:
+                # If no cart item ID is provided, create a new cart item
                 CartItem.objects.create(cart=instance, **cart_item_data)
 
         return instance
@@ -205,7 +233,6 @@ class CartUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'user', 'created_at', 'items']
-
 
 
 # Order

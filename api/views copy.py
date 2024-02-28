@@ -22,7 +22,7 @@ from .serializers import (
     ProductListSerializer, CreateProductSerializer, UpdateProductSerializer,
     CategorySerializer,
     CartSerializer, CreateCartSerializer, CartUpdateSerializer,
-    OrderSerializer, OrderCreateSerializer, OrderCreateSerializer,
+    OrderSerializer, OrderCreateSerializer, OrderUpdateSerializer,
     ReviewSerializer,
     PaymentSerializer, UserPaymentSerializer
     )
@@ -325,6 +325,19 @@ class OrderCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+# class OrderUpdateAPIView(APIView):
+#     def put(self, request, pk):
+#         try:
+#             order = Order.objects.get(pk=pk)
+#         except Order.DoesNotExist:
+#             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+#         serializer = OrderCreateSerializer(order, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class OrderUpdateAPIView(APIView):
     def put(self, request, pk):
         try:
@@ -332,7 +345,7 @@ class OrderUpdateAPIView(APIView):
         except Order.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = OrderCreateSerializer(order, data=request.data)
+        serializer = OrderUpdateSerializer(order, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

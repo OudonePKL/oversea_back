@@ -325,6 +325,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
+class ReviewCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+
 # Payment
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:

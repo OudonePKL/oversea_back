@@ -4,7 +4,7 @@ from .views import (
     CategoryListCreate, CategoryRetrieveUpdateDestroy,
     CartListView, CartDetailView, UserCartListView, CartDeleteView, CartItemDeleteView, CartCreateAPIView, CartUpdateAPIView,
     SearchView, OrderListView, OrderDetailView, UserOrderListView, OrderDeleteView, OrderCreateAPIView, OrderUpdateAPIView ,
-    ReviewListCreate, ReviewRetrieveUpdateDestroy, UserReviewListView, ReviewDeleteView,ProductReviewListView,
+    ReviewList, ReviewCreate, ReviewRetrieveUpdateDestroy, UserReviewListView, ReviewDeleteView,ProductReviewListView,
     PaymentListCreate, PaymentRetrieveUpdateDestroy, UserPaymentAPIView,
     CreateOrderView
 )
@@ -37,7 +37,8 @@ urlpatterns = [
     path('user/<int:user_id>/order', UserOrderListView.as_view(), name='user-order-list'),
     path('order/delete/<int:pk>', OrderDeleteView.as_view(), name='delete-order'),
     # Review
-    path('reviews', ReviewListCreate.as_view(), name='review-list-create'),
+    path('reviews', ReviewList.as_view(), name='review-list'),
+    path('review/create', ReviewCreate.as_view(), name='review-create'),
     path('review/<int:pk>', ReviewRetrieveUpdateDestroy.as_view(), name='review-detail'),
     path('review/update/<int:pk>', ReviewRetrieveUpdateDestroy.as_view(), name='review-update'),
     path('user/<int:user_id>/review', UserReviewListView.as_view(), name='user-reviews-list'),

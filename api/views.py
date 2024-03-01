@@ -23,7 +23,7 @@ from .serializers import (
     CategorySerializer,
     CartSerializer, CreateCartSerializer, CartUpdateSerializer,
     OrderSerializer, OrderCreateSerializer, OrderCreateSerializer,
-    ReviewSerializer,
+    ReviewSerializer, ReviewCreateSerializer,
     PaymentSerializer, UserPaymentSerializer
     )
 from .permissions import IsOwnerOrReadOnly
@@ -355,13 +355,17 @@ class OrderDeleteView(generics.DestroyAPIView):
         return Response({"message": "success"}, status=status.HTTP_204_NO_CONTENT)
 
 # Review
-class ReviewListCreate(generics.ListCreateAPIView):
+class ReviewList(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
+class ReviewCreate(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewCreateSerializer
+
 class ReviewRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+    serializer_class = ReviewCreateSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
 class UserReviewListView(generics.ListAPIView):

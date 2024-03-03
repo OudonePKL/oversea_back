@@ -6,7 +6,6 @@ from .views import (
     SearchView, OrderListView, OrderDetailView, UserOrderListView, OrderDeleteView, OrderCreateAPIView, OrderUpdateAPIView ,
     ReviewList, ReviewCreate, ReviewRetrieveUpdateDestroy, UserReviewListView, ReviewDeleteView,ProductReviewListView,
     PaymentListCreate, PaymentRetrieveUpdateDestroy, UserPaymentAPIView,
-    CreateOrderView
 )
 
 urlpatterns = [

@@ -22,7 +22,7 @@ from .serializers import (
     ProductListSerializer, CreateProductSerializer, UpdateProductSerializer,
     CategorySerializer,
     CartSerializer, CreateCartSerializer, CartUpdateSerializer,
-    OrderSerializer, OrderCreateSerializer, OrderCreateSerializer,
+    OrderSerializer, OrderCreateSerializer, 
     ReviewSerializer, ReviewCreateSerializer,
     PaymentSerializer, UserPaymentSerializer
     )
@@ -311,9 +311,9 @@ class UserOrderListView(generics.ListAPIView):
         return Order.objects.filter(user_id=user_id)
     
 
-class CreateOrderView(generics.CreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+# class CreateOrderView(generics.CreateAPIView):
+#     queryset = Order.objects.all()
+#     serializer_class = OrderSerializer
 
 
 class OrderCreateAPIView(APIView):
